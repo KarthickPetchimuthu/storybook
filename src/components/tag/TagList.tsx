@@ -27,19 +27,21 @@ const MoreTagsButton = styled(Link)`
   }
 `;
 
-type TagListTypes = {
-  tags: typeof TagItem[];
-  limit: number;
+export type TagListProps = {
+  tags: React.ReactNode[];
+  isLoading?: boolean;
+  limit?: number;
 };
 
-export const TagList = forwardRef<HTMLDivElement, TagListTypes>(
-  ({ tags, limit, ...props }: TagListTypes, ref) => {
+export const TagList = forwardRef<HTMLDivElement, TagListProps>(
+  ({ tags = [], limit = 4, isLoading = false, ...props }: TagListProps, ref) => {
     const primaryTags = tags.slice(0, limit);
     const moreTags = tags.slice(limit);
+
     const [moreTagsVisible, setMoreTagsVisible] = useState(false);
 
-    return (
-      <TagListWrapper {...props} ref={ref}>
+    const tagContent = (
+      <>
         {primaryTags}
         {moreTagsVisible && moreTags}
         {moreTags.length > 0 && !moreTagsVisible && (
@@ -47,11 +49,22 @@ export const TagList = forwardRef<HTMLDivElement, TagListTypes>(
             {`+ ${moreTags.length} more`}
           </MoreTagsButton>
         )}
+      </>
+    );
+
+    return (
+      <TagListWrapper {...props} ref={ref}>
+        {isLoading ? (
+          <>
+            <TagItem isLoading />
+            <TagItem isLoading />
+            <TagItem isLoading />
+            <TagItem isLoading />
+          </>
+        ) : (
+          tagContent
+        )}
       </TagListWrapper>
     );
   }
 );
-
-TagList.defaultProps = {
-  limit: 4,
-};
